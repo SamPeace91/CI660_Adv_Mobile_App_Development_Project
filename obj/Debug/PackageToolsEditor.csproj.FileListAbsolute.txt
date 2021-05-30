@@ -1,0 +1,2 @@
+C:\Users\skyro\Desktop\CI660_Adv_Mobile_App_Development_Project\obj\Debug\PackageToolsEditor.csprojAssemblyReference.cache
+C:\Users\skyro\Desktop\CI660_Adv_Mobile_App_Development_Project\obj\Debug\PackageToolsEditor.csproj.CoreCompileInputs.cache

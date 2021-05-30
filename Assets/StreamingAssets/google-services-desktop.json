@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "877291205123",
+    "firebase_url": "https://vladmier-the-first-default-rtdb.firebaseio.com",
+    "project_id": "vladmier-the-first",
+    "storage_bucket": "vladmier-the-first.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:877291205123:android:f99504475464adda9e5436",
+        "android_client_info": {
+          "package_name": "com.AdvMobile.VladmierTheFirst"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "877291205123-boh2gu5ib6ivbjb2458e50gjf7utmd4n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.AdvMobile.VladmierTheFirst",
+            "certificate_hash": "b75924574658ec1567f1adacd80f4916053bc2b2"
+          }
+        },
+        {
+          "client_id": "877291205123-7r3mf0qp5ibjpsaq8s4oht3n2ju5oh2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXzkBqi-Mo0FLv-X6u6TgwOETCk6YdSNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "877291205123-7r3mf0qp5ibjpsaq8s4oht3n2ju5oh2f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
