@@ -7,7 +7,6 @@ public class HealthComponent : MonoBehaviour
 {
     public float curHealth;
     public float maxHealth = 100f;
-    //private BoxCollider2D collider;
     public Animator animator;
     public HeroKnight player;
     public Bandit enemy;
@@ -27,14 +26,13 @@ public class HealthComponent : MonoBehaviour
     void Start()
     {
         curHealth = maxHealth;
-        //collider = GetComponent<BoxCollider2D>();
         animator = GetComponent<Animator>();
-        //player = GetComponent<HeroKnight>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        //Sets delay for the lose screen to appear
         if(justDied == true)
         {
             deathDelay += 0.016f;
@@ -45,44 +43,19 @@ public class HealthComponent : MonoBehaviour
                 justDied = false;
                 deathDelay = 0;
                 sceneManager.LoseScreen();
-                //this.enabled = false;
             }
         }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        /*if(collision.gameObject.tag == "Enemy")
-        {
-            print("True");
-            curHealth -= 20;
-            animator.SetTrigger("Hurt");
-
-            if (curHealth <= 0)
-            {
-                print("Dead");
-                //animator.SetTrigger("Death");
-                player.death();
-            }
-        }*/
-        /*else if(collision.gameObject.tag == "Player")
-        {
-            print("The player hurt me");
-            curHealth -= 20;
-            //animator.SetTrigger("Hurt");
-
-            if (curHealth <= 0)
-            {
-                //animator.SetTrigger("Death");
-            }
-        }*/
+        
     }
 
     public void EnemyTakeDamage(float damage)
     {
         curHealth -= damage;
         Debug.Log("Enemy health = " + curHealth);
-        // Play hurt animation
         animator.SetTrigger("Hurt");
 
         if (curHealth <= 0f)
@@ -94,9 +67,8 @@ public class HealthComponent : MonoBehaviour
     public void PlayerTakeDamage(float damage)
     {
         curHealth -= damage;
-        fillAmount.fillAmount -= damage / 100f; //0.2f;
+        fillAmount.fillAmount -= damage / 100f;
         Debug.Log("Player health = " + curHealth);
-        // Play hurt animation
         animator.SetTrigger("Hurt");
 
         if (curHealth <= 0f)
@@ -107,6 +79,7 @@ public class HealthComponent : MonoBehaviour
 
     public void PlayerHealthRegen(float healAmount)
     {
+        //Fill amount calculated, so health bar is the same as current health
         curHealth += healAmount;
         fillAmount.fillAmount += 0.2f;
         sceneManager.PotionUsed();
@@ -117,57 +90,17 @@ public class HealthComponent : MonoBehaviour
         Debug.Log("Enemy died");
         animator.SetTrigger("Death");
         enemy.Death();
-        GetComponent<Collider2D>().enabled = false; // Disable enemy collider
-        gameObject.transform.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        this.enabled = false;
+        GetComponent<Collider2D>().enabled = false; //Disable enemy collider
+        gameObject.transform.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static; //Stops input
+        this.enabled = false; //Disables enemy's health component
     }
 
     void PlayerDeath()
     {
         Debug.Log("Player died");
         animator.SetTrigger("Death");
-        //player.death();
-        GetComponent<Collider2D>().enabled = false; // Disable player collider
-        gameObject.transform.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+        GetComponent<Collider2D>().enabled = false; //Disable player collider
+        gameObject.transform.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static; //Stops input
         justDied = true;
     }
-
-    /*public void TakeDamage(int damage, Collider2D victim)
-    {
-        curHealth -= damage;
-
-        if(victim.tag == "Enemy")
-        {
-            Debug.Log("Enemy health = " + curHealth);
-        }
-
-        else if(victim.tag == "Player")
-        {
-            Debug.Log("Player health = " + curHealth);
-        }
-
-        // Play hurt animation
-        animator.SetTrigger("Hurt");
-
-        if(curHealth <= 0)
-        {
-            Die(victim);
-        }
-    }*/
-
-    /*void Die(Collider2D deadVictim)
-    {
-        if(deadVictim.tag == "Enemy")
-        {
-            Debug.Log("Enemy died");
-            animator.SetTrigger("Death");
-            GetComponent<Collider2D>().enabled = false; // Disable enemy collider
-            gameObject.transform.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-            this.enabled = false;
-        }
-        else if(deadVictim.tag == "Player")
-        {
-            Debug.Log("Player died");
-        }
-    }*/
 }
