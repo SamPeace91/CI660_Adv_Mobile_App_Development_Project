@@ -23,6 +23,7 @@ public class Door : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Load the relevant level when the player reaches the portal
         if (collider.IsTouchingLayers(playerLayer))
         {
             if(tag == "L2Door")
