@@ -7,12 +7,16 @@ using UnityEngine.SceneManagement;
 
 public class SceneManagement : MonoBehaviour
 {
+    //Obtains the HUD elements
     public int coinCount;
     public int potionCount;
     public Text coinText;
     public TextMeshProUGUI potionText;
     public TextMeshProUGUI coinResult;
+
     public HeroKnight player;
+
+    //Obtains all of the menus and overlays
     public GameObject settingsScreen;
     public GameObject pauseScreen;
     public GameObject HUD;
@@ -21,11 +25,15 @@ public class SceneManagement : MonoBehaviour
     public GameObject menuScreen;
     public GameObject winScreen;
     public GameObject loseScreen;
+
+    //Gyroscope
     public bool gyroActive = false;
     public Toggle settingsGyro;
     public Toggle pauseGyro;
     bool settingsGyroFlip = false;
     bool pauseGyroFlip = false;
+
+    //Movable Controls
     public Image joystickImg;
     public Image jumpImg;
     public Image attackImg;
@@ -42,8 +50,6 @@ public class SceneManagement : MonoBehaviour
 
     private void Awake()
     {
-        //coinText = FindObjectOfType<Text>();
-        //potionText = FindObjectOfType<TextMeshProUGUI>();
         coinText.GetComponent<Text>();
         potionText.GetComponent<TextMeshProUGUI>();
         player.GetComponent<HeroKnight>();
@@ -56,11 +62,11 @@ public class SceneManagement : MonoBehaviour
         potionCount = 0;
     }
 
-    // Loads various scenes in the game
+    //Loads various scenes in the game
     public void LevelOne()
     {
+        //Ensures all relevant screens (Canvases) are active/inactive when loading the first level
         SceneManager.LoadScene("Level 1");
-        //Screen.orientation = ScreenOrientation.Landscape;
         player.restartGame();
         player.transform.position = new Vector3(-7.15f, -4.02f, 0);
         menuScreen.SetActive(false);
@@ -68,6 +74,8 @@ public class SceneManagement : MonoBehaviour
         pauseScreen.SetActive(false);
         winScreen.SetActive(false);
         loseScreen.SetActive(false);
+
+        //Sets up all of the HUD elements
         HUD.SetActive(true);
         coinCount = 0;
         coinText.text = coinCount.ToString();
@@ -100,6 +108,8 @@ public class SceneManagement : MonoBehaviour
         pauseScreen.SetActive(false);
         winScreen.SetActive(false);
         loseScreen.SetActive(false);
+
+        //Turns off the gyroscope when returning to the Main Menu
         if (gyroActive)
         {
             settingsGyro.isOn = false;
@@ -120,9 +130,8 @@ public class SceneManagement : MonoBehaviour
         winScreen.SetActive(true);
         HUD.SetActive(false);
         controls.SetActive(false);
-        //menuScreen.SetActive(true);
         player.transform.position = new Vector3(-7.15f, -4.02f, 0);
-        coinResult.text = coinText.text;
+        coinResult.text = coinText.text; //Displays how many coins the player finished with
     }
 
     public void LoseScreen()
@@ -131,14 +140,14 @@ public class SceneManagement : MonoBehaviour
         loseScreen.SetActive(true);
         HUD.SetActive(false);
         controls.SetActive(false);
-        //menuScreen.SetActive(true);
         player.transform.position = new Vector3(-7.15f, -4.02f, 0);
     }
 
-    // Overlays
+    //Overlays
 
     public void SettingsScreen()
     {
+        //The checks ensure the correct menus/overlays/Canvases are active/inactive depending on what screen Settings is chosen from
         if (winScreen.activeSelf)
         {
             settingsScreen.SetActive(true);
@@ -156,9 +165,6 @@ public class SceneManagement : MonoBehaviour
             settingsScreen.SetActive(true);
             menuScreen.SetActive(false);
         }
-
-        //HUD.SetActive(false);
-        //controls.SetActive(false);
     }
 
     public void BackupSettings()
@@ -180,18 +186,14 @@ public class SceneManagement : MonoBehaviour
             settingsScreen.SetActive(false);
             menuScreen.SetActive(true);
         }
-
-        //HUD.SetActive(true);
-        //controls.SetActive(true);
     }
 
     public void PauseScreen()
     {
         pauseScreen.SetActive(true);
-        //pauseScreen.GetComponent<Canvas>().enabled = true;
         HUD.SetActive(false);
         controls.SetActive(false);
-        Time.timeScale = 0; // Pauses most things like physics
+        Time.timeScale = 0; //Pauses most things like physics
     }
 
     public void BackupPause()
@@ -223,6 +225,7 @@ public class SceneManagement : MonoBehaviour
 
     public void settingsGyroActivate()
     {
+        //Need to make sure that the Gyro Control toggle is applied to both the Settings and Pause overlays
         if (gyroActive && !pauseGyroFlip)
         {
             gyroActive = false;
@@ -287,6 +290,7 @@ public class SceneManagement : MonoBehaviour
             inGame = true;
         }
 
+        //Enables the Edit Controls visuals
         controls.SetActive(true);
         editControls.SetActive(true);
         joystickImg.enabled = true;
@@ -306,7 +310,6 @@ public class SceneManagement : MonoBehaviour
         if (!inGame)
         {
             settingsScreen.SetActive(true);
-            //HUD.SetActive(true);
         }
         else if (inGame)
         {
@@ -326,36 +329,4 @@ public class SceneManagement : MonoBehaviour
         potionScript.enabled = false;
         shieldScript.enabled = false;
     }
-
-    /*public void gyroActivation()
-    {
-        if (gyroActive)
-        {
-            gyroActive = false;
-            if (settingsGyro.isOn)
-            {
-                settingsGyro.isOn = false;
-            }
-            if (pauseGyro.isOn)
-            {
-                pauseGyro.isOn = false;
-            }
-            Debug.Log("NOT ACTIVE");
-            player.gyroControls();
-        }
-        else
-        {
-            gyroActive = true;
-            if (!settingsGyro.isOn)
-            {
-                settingsGyro.isOn = true;
-            }
-            if (!pauseGyro.isOn)
-            {
-                pauseGyro.isOn = true;
-            }
-            Debug.Log("ACTIVE");
-            player.gyroControls();
-        }
-    }*/
 }
