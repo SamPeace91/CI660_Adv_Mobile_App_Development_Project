@@ -11,6 +11,7 @@ public class MovableControls : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Captures initial position of the controls for later use
         colliderToMove = GetComponent<Collider2D>();
         initialPosition = transform.position;
     }
@@ -20,13 +21,13 @@ public class MovableControls : MonoBehaviour
     {
         if(Input.touchCount > 0)
         {
+            //Obtains all of the current touch inputs
             Touch touch = Input.GetTouch(0);
-            Vector2 touchPosition = touch.position; //Camera.main.ScreenToWorldPoint(touch.position);
-            //touchPosition.z = 0f;
+            Vector2 touchPosition = touch.position;
 
             if(touch.phase == TouchPhase.Began)
             {
-                //Debug.Log("Touching began");
+                //Checks to see if the touch is interacting with the control's collider
                 Collider2D touchedCollider = Physics2D.OverlapPoint(touchPosition);
                 if(colliderToMove == touchedCollider)
                 {
@@ -37,8 +38,7 @@ public class MovableControls : MonoBehaviour
 
             if(touch.phase == TouchPhase.Moved)
             {
-                //Debug.Log("Touch movement sensed");
-                //Debug.Log(touchPosition);
+                //Only moves the controller if the collider is overlapping
                 if (moveAllowed)
                 {
                     transform.position = new Vector2(touchPosition.x, touchPosition.y);
@@ -49,13 +49,13 @@ public class MovableControls : MonoBehaviour
             if(touch.phase == TouchPhase.Ended)
             {
                 moveAllowed = false;
-                //Debug.Log("Moving not allowed");
             }
         }
     }
 
     public void Reset()
     {
+        //Reset the control's position to its original state
         transform.position = initialPosition;
     }
 }

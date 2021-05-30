@@ -11,7 +11,6 @@ public class Pickup : MonoBehaviour
 
     private void Awake()
     {
-        //sceneManager.GetComponent<SceneManagement>();
         sceneManager = FindObjectOfType<SceneManagement>();
     }
 
@@ -24,6 +23,7 @@ public class Pickup : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Calls the relevant function depending on what is picked up
         if (collider.IsTouchingLayers(playerLayer))
         {
             if(this.tag == "Coin")
@@ -36,6 +36,7 @@ public class Pickup : MonoBehaviour
                 sceneManager.PotionPickup();
             }
 
+            //Disables the item when it is picked up
             this.collider.enabled = false;
             this.gameObject.SetActive(false);
         }
