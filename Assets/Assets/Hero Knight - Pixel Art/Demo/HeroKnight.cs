@@ -24,6 +24,8 @@ public class HeroKnight : MonoBehaviour {
     private float               m_timeSinceAttack = 0.0f;
     private float               m_delayToIdle = 0.0f;
 
+    //My Additions
+
     //Adding touch controls
     public Joystick joystick;
     public float runSpeed = 40f;
@@ -32,18 +34,19 @@ public class HeroKnight : MonoBehaviour {
     public Button blockButton;
     public Button attackButton;
     public Button rollButton;
-    //RaycastHit2D attackHit;
+
+    //Attacking
     public Transform attackPointRight;
     public Transform attackPointLeft;
     public float attackRange = 0.5f;
     public float attackDamage = 20f;
     public float attackRate = 2f;
     float nextAttackTime = 0f;
+
+    //Other
     public LayerMask enemyLayers;
-    //Vector2 bodyMovement;
     public SceneManagement sceneManager;
     public Collider2D playerCollider;
-    //bool gyroActive = false;
     float gyroDirection = 0f;
     float gyroMoveSpeed = 10f;
     public Collider2D groundCollider;
@@ -69,7 +72,7 @@ public class HeroKnight : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-        // Increase timer that controls attack combo
+        //Increase timer that controls attack combo
         m_timeSinceAttack += Time.deltaTime;
 
         //Check if character just landed on the ground
@@ -77,10 +80,6 @@ public class HeroKnight : MonoBehaviour {
         {
             m_grounded = true;
             m_animator.SetBool("Grounded", m_grounded);
-            /*if (sceneManager.gyroActive)
-            {
-                Input.gyro.enabled = true;
-            }*/
         }
 
         //Check if character just started falling
@@ -88,17 +87,13 @@ public class HeroKnight : MonoBehaviour {
         {
             m_grounded = false;
             m_animator.SetBool("Grounded", m_grounded);
-            /*if (sceneManager.gyroActive)
-            {
-                Input.gyro.enabled = false;
-            }*/
         }
 
-        // -- Handle input and movement --
-        float inputX = joystick.Horizontal; //Input.GetAxis("Horizontal");
+        //Input and movement
+        float inputX = joystick.Horizontal;
         float inputY = joystick.Vertical;
 
-        // Swap direction of sprite depending on walk direction
+        //Swap direction of sprite depending on walk direction
         if (inputX > 0 || Input.acceleration.x >= 0.2f)
         {
             GetComponent<SpriteRenderer>().flipX = false;
@@ -111,22 +106,24 @@ public class HeroKnight : MonoBehaviour {
             m_facingDirection = -1;
         }
 
-        // Move
+        //Move
         if (!m_rolling)
         {
-            //m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
+            //Uses virtual joystick's horizontal tilt
             if (joystick.Horizontal >= 0.2f || joystick.Horizontal <= -0.2f)
             {
+                //Provides velocity to the player, so they move
                 m_body2d.velocity = new Vector2(inputX * m_speed, m_body2d.velocity.y);
             }
             else
             {
-                if (sceneManager.gyroActive) //&& groundCollider.IsTouchingLayers())
+                //Only uses the gyroscope if the joystick is not being touched
+                if (sceneManager.gyroActive)
                 {
+                    //Uses the gyroscope's 'x' axis tilt
                     if (Input.acceleration.x >= 0.2f || Input.acceleration.x <= -0.2f)
                     {
                         gyroDirection = Input.acceleration.x * gyroMoveSpeed;
-                        //transform.position = new Vector2(Mathf.Clamp(transform.position.x, -10f, 10f), transform.position.y);
                         m_body2d.velocity = new Vector2(gyroDirection, m_body2d.velocity.y);
                     }
                     else
@@ -144,7 +141,8 @@ public class HeroKnight : MonoBehaviour {
         //Set AirSpeed in animator
         m_animator.SetFloat("AirSpeedY", m_body2d.velocity.y);
 
-        // -- Handle Animations --
+        //Animations
+
         //Wall Slide
         m_animator.SetBool("WallSlide", (m_wallSensorR1.State() && m_wallSensorR2.State()) || (m_wallSensorL1.State() && m_wallSensorL2.State()));
 
@@ -160,33 +158,18 @@ public class HeroKnight : MonoBehaviour {
             m_animator.SetTrigger("Hurt");
 
         //Attack
-        else if(/*Input.GetMouseButtonDown(0) &&*/ attackButton.IsInvoking() && Time.time >= nextAttackTime)
+        else if(attackButton.IsInvoking() && Time.time >= nextAttackTime)
         {   
+            //Ensures the player cannot spam the attack button
             if(m_timeSinceAttack > 0.25f && !m_rolling)
             {
                 attack();
                 nextAttackTime = Time.time + 1f / attackRate;
             }
-
-            /*m_currentAttack++;
-
-            // Loop back to one after third attack
-            if (m_currentAttack > 3)
-                m_currentAttack = 1;
-
-            // Reset Attack combo if time since last attack is too large
-            if (m_timeSinceAttack > 1.0f)
-                m_currentAttack = 1;
-
-            // Call one of three attack animations "Attack1", "Attack2", "Attack3"
-            m_animator.SetTrigger("Attack" + m_currentAttack);
-
-            // Reset timer
-            m_timeSinceAttack = 0.0f;*/
         }
 
-        // Block
-        else if (/*Input.GetMouseButtonDown(1)*/ inputY < -0.5 && !m_rolling)
+        //Block
+        else if (inputY < -0.5 && !m_rolling)
         {
             m_animator.SetTrigger("Block");
             m_animator.SetBool("IdleBlock", true);
@@ -195,7 +178,7 @@ public class HeroKnight : MonoBehaviour {
         else if (Input.GetMouseButtonUp(1))
             m_animator.SetBool("IdleBlock", false);
 
-        // Roll
+        //Roll
         else if (Input.GetKeyDown("left shift") && !m_rolling)
         {
             m_rolling = true;
@@ -204,23 +187,20 @@ public class HeroKnight : MonoBehaviour {
         }  
 
         //Jump
-        else if (/*Input.GetKeyDown("space")*/ (inputY > 0.5 || (Input.acceleration.z >= -0.625f && sceneManager.gyroActive)) && m_grounded && !m_rolling && groundCollider.IsTouchingLayers())
+        //Uses the 'z' axis on the gyroscope if active
+        else if ((inputY > 0.5 || (Input.acceleration.z >= -0.625f && sceneManager.gyroActive)) && m_grounded && !m_rolling && groundCollider.IsTouchingLayers())
         {
             m_animator.SetTrigger("Jump");
             m_grounded = false;
             m_animator.SetBool("Grounded", m_grounded);
             m_body2d.velocity = new Vector2(m_body2d.velocity.x, m_jumpForce);
             m_groundSensor.Disable(0.2f);
-            /*if (sceneManager.gyroActive && groundCollider.IsTouchingLayers())
-            {
-                //Input.gyro.enabled = false;
-            }*/
         }
 
         //Run
         else if (Mathf.Abs(inputX) > Mathf.Epsilon || Input.acceleration.x >= 0.2f || Input.acceleration.x <= -0.2f)
         {
-            // Reset timer
+            //Reset timer
             m_delayToIdle = 0.05f;
             m_animator.SetInteger("AnimState", 1);
         }
@@ -228,21 +208,21 @@ public class HeroKnight : MonoBehaviour {
         //Idle
         else
         {
-            // Prevents flickering transitions to idle
+            //Prevents flickering transitions to idle
             m_delayToIdle -= Time.deltaTime;
                 if(m_delayToIdle < 0)
                     m_animator.SetInteger("AnimState", 0);
         }
     }
 
-    // Animation Events
-    // Called in end of roll animation.
+    //Animation Events
+    //Called in end of roll animation.
     void AE_ResetRoll()
     {
         m_rolling = false;
     }
 
-    // Called in slide animation.
+    //Called in slide animation.
     void AE_SlideDust()
     {
         Vector3 spawnPosition;
@@ -254,9 +234,9 @@ public class HeroKnight : MonoBehaviour {
 
         if (m_slideDust != null)
         {
-            // Set correct arrow spawn position
+            //Set correct arrow spawn position
             GameObject dust = Instantiate(m_slideDust, spawnPosition, gameObject.transform.localRotation) as GameObject;
-            // Turn arrow in correct direction
+            //Turn arrow in correct direction
             dust.transform.localScale = new Vector3(m_facingDirection, 1, 1);
         }
     }
@@ -266,15 +246,6 @@ public class HeroKnight : MonoBehaviour {
         float r1PosX = m_wallSensorR1.gameObject.transform.position.x;
         float r1PosZ = m_wallSensorR1.gameObject.transform.position.z;
         float r2PosZ = m_wallSensorR2.gameObject.transform.position.z;
-        //attackHit = Physics2D.Raycast((m_wallSensorR2.gameObject.transform.position - m_wallSensorR1.gameObject.transform.position), transform.forward, 5);
-        //Debug.DrawLine(new Vector3(r1PosX, 0, r2PosZ - r1PosZ), new Vector3(r1PosX + 5, 0, r2PosZ - r1PosZ), Color.red, 3);
-        /*if (sceneManager.gyroActive && groundCollider.IsTouchingLayers())
-        {
-            if(Input.acceleration.x >= 0.2f || Input.acceleration.x <= -0.2f)
-            {
-                m_body2d.velocity = new Vector2(gyroDirection, 0f);
-            }
-        }*/
     }
 
     public void jump()
@@ -286,11 +257,6 @@ public class HeroKnight : MonoBehaviour {
             m_animator.SetBool("Grounded", m_grounded);
             m_body2d.velocity = new Vector2(m_body2d.velocity.x, m_jumpForce);
             m_groundSensor.Disable(0.2f);
-            /*if (sceneManager.gyroActive)
-            {
-                gyroControls();
-                Input.gyro.enabled = false;
-            }*/
         }
     }
 
@@ -310,22 +276,15 @@ public class HeroKnight : MonoBehaviour {
 
     public void attack()
     {
-        //if (m_timeSinceAttack > 0.25f && !m_rolling)
-        //{
-            //RaycastHit2D attackHit = Physics2D.Raycast((m_wallSensorR2.gameObject.transform.position - m_wallSensorR1.gameObject.transform.position), transform.forward);
-            /*if (attackHit.collider.tag == "Enemy")
-            {
-                print("ENEMY HIT");
-            }*/
-
         if(m_facingDirection > 0)
         {
+            //Obtains all of the enemies that are overlapping the attack sensors
             Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPointRight.position, attackRange, enemyLayers);
 
+            //Deals damage to each enemy overlapping the attack sensors
             foreach (Collider2D enemy in hitEnemies)
             {
                 enemy.GetComponent<HealthComponent>().EnemyTakeDamage(attackDamage);
-                //Debug.Log("We hit " + enemy.name);
             }
         }
         else if(m_facingDirection < 0)
@@ -335,26 +294,24 @@ public class HeroKnight : MonoBehaviour {
             foreach (Collider2D enemy in hitEnemies)
             {
                 enemy.GetComponent<HealthComponent>().EnemyTakeDamage(attackDamage);
-                //Debug.Log("We hit " + enemy.name);
             }
         }
 
         m_currentAttack++;
 
-        // Loop back to one after third attack
+        //Loop back to one after third attack
         if (m_currentAttack > 3)
             m_currentAttack = 1;
 
-        // Reset Attack combo if time since last attack is too large
+        //Reset Attack combo if time since last attack is too large
         if (m_timeSinceAttack > 1.0f)
             m_currentAttack = 1;
 
-        // Call one of three attack animations "Attack1", "Attack2", "Attack3"
+        //Call one of three attack animations "Attack1", "Attack2", "Attack3"
         m_animator.SetTrigger("Attack" + m_currentAttack);
 
-        // Reset timer
+        //Reset timer
         m_timeSinceAttack = 0.0f;
-        //}
     }
 
     void OnDrawGizmosSelected()
@@ -380,6 +337,7 @@ public class HeroKnight : MonoBehaviour {
 
     public void healthRegen()
     {
+        //Regens health when a potion is picked up, but only usable if the player has 80 or less health remaining
         if(healthComponent.curHealth <= 80f && sceneManager.potionCount >= 1)
         {
             healthComponent.PlayerHealthRegen(20f);
@@ -393,7 +351,7 @@ public class HeroKnight : MonoBehaviour {
 
     public void restartGame()
     {
-        //m_animator.SetInteger("AnimState", 0);
+        //Resets the player after death (so they can be controlled again)
         m_animator.SetTrigger("Block");
         playerCollider.enabled = true;
         m_body2d.bodyType = RigidbodyType2D.Dynamic;
@@ -401,6 +359,7 @@ public class HeroKnight : MonoBehaviour {
 
     public void death()
     {
+        //Turns off all of the controls upon death
         m_animator.SetBool("noBlood", m_noBlood);
         m_animator.SetTrigger("Death");
         jumpButton.gameObject.SetActive(false);
@@ -415,10 +374,10 @@ public class HeroKnight : MonoBehaviour {
     {
         if (!sceneManager.gyroActive)
         {
+            //Checks to see if the device supports gyro controls
             if (SystemInfo.supportsGyroscope)
             {
                 Input.gyro.enabled = false;
-                //gyroActive = false;
                 Debug.Log("Gyroscope deactivated.");
             }
         }
@@ -427,7 +386,6 @@ public class HeroKnight : MonoBehaviour {
             if (SystemInfo.supportsGyroscope)
             {
                 Input.gyro.enabled = true;
-                //gyroActive = true;
                 Debug.Log("Gyroscope activated.");
             }
         }
